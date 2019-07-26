@@ -26,7 +26,7 @@ app.post('/api/posts', verifyRoute,  (req,res)=> {
 });
 
 app.post('/api/login', (req, res)=> {
-  // user  => req.to login and send pass auth stuff with db
+  // user  => req to login and send pass auth stuff to db form server
   // and get user back
   const user = {
     id: 1,
@@ -42,10 +42,9 @@ app.post('/api/login', (req, res)=> {
 })
 
 //  format token = authorization : Bearer <access_TOKEN>
-// we go to pus it out
+// we go to put it out from header
 
-
-//verify token  middle
+//verify token  middleware
 function verifyRoute(req,res,next) {
   // get auth header value
   // for send token in header
