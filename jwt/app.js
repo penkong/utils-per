@@ -10,14 +10,61 @@ app.get('/api', (req,res) => {
   });
 });
 
-app.post('/api/posts', (req,res)=> {
-  res.json({
-    message: 'post created'
-  })
+
+// protected route
+app.post('/api/posts', verifyRoute,  (req,res)=> {
+  jwt.verify(req.token, 'secretKEy=', (err, authData) => {
+    if(err) {
+      res.sendStatus(403);
+    } else {
+      res.json({
+        message: 'post created',
+        authData
+      });
+    };
+  });
 });
 
-app.post('/api/login', (req, res))
+app.post('/api/login', (req, res)=> {
+  // user  => req.to login and send pass auth stuff with db
+  // and get user back
+  const user = {
+    id: 1,
+    userName: 'mk',
+    email: 'mk@gmail.com',
+  }
+  // payload
+  jwt.sign({ user }, 'secretKEy=', { expiresIn: '60000s'}, (err, token) => {
+    res.json({
+      token
+    });
+  });
+})
+
+//  format token = authorization : Bearer <access_TOKEN>
+// we go to pus it out
 
 
+//verify token  middle
+function verifyRoute(req,res,next) {
+  // get auth header value
+  // for send token in header
+  const bearerHeader = req.headers['authorization'];
+  // check
+  if(typeof bearerHeader !== 'undefined') {
+    // split at space'
+    const bearer = bearerHeader.split(' ');
+    // get token 
+    const bearerToken = bearer[1];
+    // set token
+    req.token = bearerToken;
+    // call next();
+    next();
+  } else {
+    // forbidden
+    res.sendStatus(403);
+  }
+
+} 
 
 app.listen(5000, () => console.log('sever start at 5000'));
